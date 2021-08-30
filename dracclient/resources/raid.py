@@ -932,6 +932,7 @@ class RAIDManagement(object):
         physical_disks = self.list_physical_disks()
 
         raid = constants.RaidStatus.raid
+        jbod = constants.RaidStatus.jbod
 
         if not controllers_to_physical_disk_ids:
             controllers_to_physical_disk_ids = collections.defaultdict(list)
@@ -945,6 +946,12 @@ class RAIDManagement(object):
                         physical_d.controller]
 
                     physical_disk_ids.append(physical_d.id)
+
+        # Excluding H755 RAID controller from converting to non-RAID
+        for cntlr in all_controllers:
+            if cntlr.model.startswith("PERC H755") and mode == jbod:
+                if cntlr.id in controllers_to_physical_disk_ids:
+                    del controllers_to_physical_disk_ids[cntlr.id]
 
         '''Modify controllers_to_physical_disk_ids dict by inspecting desired
         status vs current status of each controller's disks.

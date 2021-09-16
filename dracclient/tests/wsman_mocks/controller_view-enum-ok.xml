@@ -93,6 +93,55 @@
           <n1:SupportRAID10UnevenSpans>0</n1:SupportRAID10UnevenSpans>
           <n1:T10PICapability>0</n1:T10PICapability>
         </n1:DCIM_ControllerView>
+        <n1:DCIM_ControllerView>
+          <n1:AlarmState>1</n1:AlarmState>
+          <n1:BootVirtualDiskFQDD xsi:nil="true"/>
+          <n1:Bus>1</n1:Bus>
+          <n1:CacheSizeInMB>8192</n1:CacheSizeInMB>
+          <n1:CachecadeCapability>0</n1:CachecadeCapability>
+          <n1:ConfigLockdownCapable>0</n1:ConfigLockdownCapable>
+          <n1:ConfigLockdownState>0</n1:ConfigLockdownState>
+          <n1:ConnectorCount>4</n1:ConnectorCount>
+          <n1:ControllerFirmwareVersion>52.13.2-3661</n1:ControllerFirmwareVersion>
+          <n1:Device>0</n1:Device>
+          <n1:DeviceCardDataBusWidth>Unknown</n1:DeviceCardDataBusWidth>
+          <n1:DeviceCardManufacturer>DELL</n1:DeviceCardManufacturer>
+          <n1:DeviceCardSlotLength>2</n1:DeviceCardSlotLength>
+          <n1:DeviceCardSlotType>Unknown</n1:DeviceCardSlotType>
+          <n1:DeviceDescription>RAID Controller in SL 8</n1:DeviceDescription>
+          <n1:DriverVersion xsi:nil="true"/>
+          <n1:EncryptionCapability>1</n1:EncryptionCapability>
+          <n1:EncryptionMode>0</n1:EncryptionMode>
+          <n1:FQDD>RAID.SL.8-1</n1:FQDD>
+          <n1:Function>0</n1:Function>
+          <n1:InstanceID>RAID.SL.8-1</n1:InstanceID>
+          <n1:KeyID xsi:nil="true"/>
+          <n1:LastSystemInventoryTime>20210831081620.000000+000</n1:LastSystemInventoryTime>
+          <n1:LastUpdateTime>20210831081620.000000+000</n1:LastUpdateTime>
+          <n1:MaxAvailablePCILinkSpeed xsi:nil="true"/>
+          <n1:MaxPossiblePCILinkSpeed xsi:nil="true"/>
+          <n1:PCIDeviceID>10E2</n1:PCIDeviceID>
+          <n1:PCISlot xsi:nil="true"/>
+          <n1:PCISubDeviceID>1AE1</n1:PCISubDeviceID>
+          <n1:PCISubVendorID>1028</n1:PCISubVendorID>
+          <n1:PCIVendorID>1000</n1:PCIVendorID>
+          <n1:PatrolReadState>1</n1:PatrolReadState>
+          <n1:PersistentHotspare>0</n1:PersistentHotspare>
+          <n1:PrimaryStatus>0</n1:PrimaryStatus>
+          <n1:ProductName>PERC H755 Front</n1:ProductName>
+          <n1:RealtimeCapability>0</n1:RealtimeCapability>
+          <n1:RollupStatus>0</n1:RollupStatus>
+          <n1:SASAddress>52CEA7F06A603500</n1:SASAddress>
+          <n1:SecurityStatus>1</n1:SecurityStatus>
+          <n1:SharedSlotAssignmentAllowed>0</n1:SharedSlotAssignmentAllowed>
+          <n1:SlicedVDCapability>1</n1:SlicedVDCapability>
+          <n1:SupportControllerBootMode>0</n1:SupportControllerBootMode>
+          <n1:SupportEnhancedAutoForeignImport>1</n1:SupportEnhancedAutoForeignImport>
+          <n1:SupportRAID10UnevenSpans>1</n1:SupportRAID10UnevenSpans>
+          <n1:T10PICapability>0</n1:T10PICapability>
+          <n1:UpdateLockdownCapable>0</n1:UpdateLockdownCapable>
+          <n1:UpdateLockdownState>0</n1:UpdateLockdownState>
+        </n1:DCIM_ControllerView>
       </wsman:Items>
       <wsen:EnumerationContext/>
       <wsman:EndOfSequence/>

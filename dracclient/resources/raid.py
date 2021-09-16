@@ -911,6 +911,15 @@ class RAIDManagement(object):
         RAID to JBOD or vice versa.  It does this by only converting the
         disks that are not already in the correct state.
 
+        When converting H755 RAID controller physical disks to non-RAID mode,
+        RAID-0 virtual disks get created for each physical disk and disks moved
+        to 'Online' state.
+
+        This is different from other controllers supporting non-RAID conversion
+        and takes up physical disks that cannot be used for user intended RAID
+        configuration later. H755 RAID controllers are excluded from converting
+        to non-RAID mode leaving disks in 'Ready' state.
+
         :param mode: constants.RaidStatus enumeration that indicates the mode
                      to change the disks to.
         :param controllers_to_physical_disk_ids: Dictionary of controllers and
@@ -934,10 +943,10 @@ class RAIDManagement(object):
         raid = constants.RaidStatus.raid
         jbod = constants.RaidStatus.jbod
 
+        all_controllers = self.list_raid_controllers()
         if not controllers_to_physical_disk_ids:
             controllers_to_physical_disk_ids = collections.defaultdict(list)
 
-            all_controllers = self.list_raid_controllers()
             for physical_d in physical_disks:
                 # Weed out disks that are not attached to a RAID controller
                 if self.is_raid_controller(physical_d.controller,
@@ -947,11 +956,23 @@ class RAIDManagement(object):
 
                     physical_disk_ids.append(physical_d.id)
 
-        # Excluding H755 RAID controller from converting to non-RAID
-        for cntlr in all_controllers:
-            if cntlr.model.startswith("PERC H755") and mode == jbod:
-                if cntlr.id in controllers_to_physical_disk_ids:
+        # Filter out PERC H755 controller as it creates RAID0 virtual disks
+        # when in non-RAID mode
+        controllers_to_results = {}
+        if mode == jbod:
+            for cntlr in all_controllers:
+                if cntlr.model.startswith("PERC H755") and \
+                 cntlr.id in controllers_to_physical_disk_ids:
+                    LOG.debug("Excluding {} from converting to "
+                              "non-RAID mode".format(cntlr.model))
                     del controllers_to_physical_disk_ids[cntlr.id]
+                    controllers_to_results[cntlr.id] = \
+                        utils.build_return_dict(
+                            doc=None,
+                            resource_uri=None,
+                            is_commit_required_value=False,
+                            is_reboot_required_value=constants.
+                            RebootRequired.false)
 
         '''Modify controllers_to_physical_disk_ids dict by inspecting desired
         status vs current status of each controller's disks.
@@ -961,7 +982,6 @@ class RAIDManagement(object):
         final_ctls_to_phys_disk_ids = self._check_disks_status(
                 mode, physical_disks, controllers_to_physical_disk_ids)
 
-        controllers_to_results = {}
         for controller, physical_disk_ids \
                 in final_ctls_to_phys_disk_ids.items():
             if physical_disk_ids:

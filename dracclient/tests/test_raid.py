@@ -1354,7 +1354,7 @@ class ClientRAIDManagementTestCase(base.BaseTest):
     def test_change_physical_disk_state_jbod(
             self, mock_requests,
             mock_convert_physical_disks,
-            mock_wait_until_idrac_is_ready):
+            wait_until_idrac_is_ready):
         mode = constants.RaidStatus.jbod
         mock_requests.post('https://1.2.3.4:443/wsman',
                            [{'text': test_utils.RAIDEnumerations[
@@ -1397,12 +1397,12 @@ class ClientRAIDManagementTestCase(base.BaseTest):
         mode = constants.RaidStatus.raid
         disk_1_non_raid = self.disk_1._replace(raid_status='non-RAID')
         disk_2_non_raid = self.disk_2._replace(raid_status='non-RAID')
-        mock_requests.post(
-            'https://1.2.3.4:443/wsman',
-            text=test_utils.RAIDEnumerations[uris.DCIM_ControllerView]['ok'])
         physical_disks = [disk_1_non_raid, disk_2_non_raid,
                           self.disk_3, self.disk_4, self.disk_5]
         mock_list_physical_disks.return_value = physical_disks
+        mock_requests.post(
+            'https://1.2.3.4:443/wsman',
+            text=test_utils.RAIDEnumerations[uris.DCIM_ControllerView]['ok'])
         boss_return_value = {'is_commit_required': False,
                              'is_reboot_required':
                              constants.RebootRequired.false}
@@ -1427,15 +1427,20 @@ class ClientRAIDManagementTestCase(base.BaseTest):
     @mock.patch.object(dracclient.client.WSManClient,
                        'wait_until_idrac_is_ready', spec_set=True,
                        autospec=True)
+    @mock.patch.object(dracclient.resources.raid.RAIDManagement,
+                       'list_physical_disks', spec_set=True,
+                       autospec=True)
     def test_change_physical_disk_state_none(
             self, mock_requests,
+            mock_list_physical_disks,
             mock_wait_until_idrac_is_ready):
         mode = constants.RaidStatus.raid
-        mock_requests.post('https://1.2.3.4:443/wsman',
-                           [{'text': test_utils.RAIDEnumerations[
-                            uris.DCIM_PhysicalDiskView]['ok']},
-                            {'text': test_utils.RAIDEnumerations[
-                             uris.DCIM_ControllerView]['ok']}])
+        physical_disks = [self.disk_1, self.disk_2, self.disk_3, self.disk_4,
+                          self.disk_5]
+        mock_list_physical_disks.return_value = physical_disks
+        mock_requests.post(
+            'https://1.2.3.4:443/wsman',
+            text=test_utils.RAIDEnumerations[uris.DCIM_ControllerView]['ok'])
         expected_return_value = {'is_commit_required': False,
                                  'is_reboot_required':
                                  constants.RebootRequired.false}
@@ -1481,6 +1486,8 @@ class ClientRAIDManagementTestCase(base.BaseTest):
         self.assertEqual(results['conversion_results']['RAID.Integrated.1-1'],
                          expected_return_value)
         self.assertEqual(results['conversion_results']['AHCI.Integrated.1-1'],
+                         expected_return_value)
+        self.assertEqual(results['conversion_results']['RAID.SL.8-1'],
                          expected_return_value)
 
     @mock.patch.object(dracclient.client.WSManClient,
@@ -1550,24 +1557,30 @@ class ClientRAIDManagementTestCase(base.BaseTest):
                        'wait_until_idrac_is_ready', spec_set=True,
                        autospec=True)
     @mock.patch.object(dracclient.resources.raid.RAIDManagement,
+                       'list_physical_disks', spec_set=True,
+                       autospec=True)
+    @mock.patch.object(dracclient.resources.raid.RAIDManagement,
                        'convert_physical_disks', spec_set=True,
                        autospec=True)
     def test_change_physical_disk_state_with_no_dict(
             self, mock_requests,
             mock_convert_physical_disks,
+            mock_list_physical_disks,
             mock_wait_until_idrac_is_ready):
-        mock_requests.post('https://1.2.3.4:443/wsman',
-                           [{'text': test_utils.RAIDEnumerations[
-                            uris.DCIM_PhysicalDiskView]['ok']},
-                            {'text': test_utils.RAIDEnumerations[
-                             uris.DCIM_ControllerView]['ok']}])
+        mock_requests.post(
+            'https://1.2.3.4:443/wsman',
+            text=test_utils.RAIDEnumerations[uris.DCIM_ControllerView]['ok'])
         mode = constants.RaidStatus.jbod
+        physical_disks = [self.disk_1, self.disk_2, self.disk_3, self.disk_4,
+                          self.disk_5]
+        mock_list_physical_disks.return_value = physical_disks
         cvt_phys_disks_return_value = {'is_commit_required': True,
                                        'is_reboot_required': constants.
                                        RebootRequired.true}
         h755_return_value = {'is_commit_required': False,
                              'is_reboot_required':
                              constants.RebootRequired.false}
+
         mock_convert_physical_disks.return_value = cvt_phys_disks_return_value
         expected_return_value = {'RAID.Integrated.1-1':
                                  cvt_phys_disks_return_value,

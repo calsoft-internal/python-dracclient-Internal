@@ -911,13 +911,13 @@ class RAIDManagement(object):
         RAID to JBOD or vice versa.  It does this by only converting the
         disks that are not already in the correct state.
 
-        When converting H755 RAID controller physical disks to non-RAID mode,
-        RAID-0 virtual disks get created for each physical disk and disks moved
-        to 'Online' state.
+        When converting Dell EMC PERC H755 RAID controller physical disks
+        to non-RAID mode, RAID-0 virtual disks get created for each physical
+        disk and disks moved to 'Online' state.
 
         This is different from other controllers supporting non-RAID conversion
-        and takes up physical disks that cannot be used for user intended RAID
-        configuration later. H755 RAID controllers are excluded from converting
+        and takes up physical disks that cannot be later used for user intended
+        RAID configuration. H755 RAID controllers are excluded when converting
         to non-RAID mode leaving disks in 'Ready' state.
 
         :param mode: constants.RaidStatus enumeration that indicates the mode
@@ -956,9 +956,12 @@ class RAIDManagement(object):
 
                     physical_disk_ids.append(physical_d.id)
 
-        # Filter out PERC H755 controller as it creates RAID0 virtual disks
-        # when in non-RAID mode
         controllers_to_results = {}
+
+        # Filter out PERC H755 controller as it creates RAID-0 virtual disks
+        # when in non-RAID mode. Returns conversion result dictionary
+        # containing is_commit_required and is_reboot_required key with
+        # the value always set to False.
         if mode == jbod:
             for cntlr in all_controllers:
                 if cntlr.model.startswith("PERC H755") and \

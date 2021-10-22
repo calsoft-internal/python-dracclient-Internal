@@ -61,7 +61,7 @@ class iDRACCardAttribute(object):
         fqdd = utils.get_wsman_resource_attr(
             idrac_attr_xml, namespace, 'FQDD')
         group_id = utils.get_wsman_resource_attr(
-            idrac_attr_xml, namespace, 'GroupID')
+            idrac_attr_xml, namespace, 'GroupID', nullable=True)
 
         return cls(name, instance_id, current_value, pending_value,
                    (read_only == 'true'), fqdd, group_id)
@@ -218,9 +218,9 @@ class iDRACCardIntegerAttribute(iDRACCardAttribute):
 
         idrac_attr = iDRACCardAttribute.parse(cls.namespace, idrac_attr_xml)
         lower_bound = utils.get_wsman_resource_attr(
-            idrac_attr_xml, cls.namespace, 'LowerBound')
+            idrac_attr_xml, cls.namespace, 'LowerBound', nullable=True)
         upper_bound = utils.get_wsman_resource_attr(
-            idrac_attr_xml, cls.namespace, 'UpperBound')
+            idrac_attr_xml, cls.namespace, 'UpperBound', nullable=True)
 
         if idrac_attr.current_value:
             idrac_attr.current_value = int(idrac_attr.current_value)
